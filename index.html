@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For Akshara</title>
-    <!-- Elegant fonts: Playfair for headers, Lora for body -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Smoother, Softer Purple Palette */
-            --primary: #b39ddb; 
+            var(--primary): #b39ddb; 
             --background: #110c22; 
             --text-light: #e0e0eb; 
             
-            /* Glassmorphism styling - softened */
             --glass-bg: rgba(140, 110, 210, 0.04); 
             --glass-border: rgba(190, 160, 255, 0.09); 
             
-            /* Smooth Transition timings */
             --transition-speed: 1.4s; 
             --smooth-ease: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -32,11 +28,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            overflow-y: auto;   /* Allow vertical scrolling on mobile */
         }
 
-        /* Ambient, very soft center glow */
         .glow {
             position: absolute;
             width: 80vw;
@@ -50,7 +45,6 @@
             filter: blur(50px);
         }
 
-        /* Fluid particle effect */
         .particle {
             position: absolute;
             border-radius: 50%;
@@ -59,8 +53,110 @@
             pointer-events: none;
         }
 
+        /* --- STICKERS & VINYL CSS --- */
+        .stickers-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Let clicks pass through to the button */
+            z-index: 5; /* Behind the main text box, but above background */
+        }
+
+        .sticker {
+            position: absolute;
+            opacity: 0;
+            /* Start slightly pushed out and scaled down */
+            transform: scale(0.6) rotate(var(--rot)) translateY(30px);
+            transition: all 1.8s var(--smooth-ease);
+        }
+
+        /* When the JS adds the 'visible' class */
+        .sticker.show {
+            opacity: 0.8;
+            transform: scale(1) rotate(var(--rot)) translateY(0);
+        }
+
+        /* Glass Quote Note Design */
+        .quote-note {
+            background: rgba(140, 110, 210, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(190, 160, 255, 0.15);
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: #d1c4e9;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 160px;
+            text-align: center;
+        }
+        
+        /* The "tape" holding the note */
+        .quote-note::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-4deg);
+            width: 50px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Pure CSS Vinyl Record Design */
+        .vinyl-disc {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            /* Creating the grooves of a record */
+            background: repeating-radial-gradient(
+                circle at center, 
+                #111 0, #111 2px, 
+                #222 3px, #222 4px
+            );
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* The colorful center label */
+        .vinyl-label {
+            width: 35%;
+            height: 35%;
+            border-radius: 50%;
+            background: #b39ddb; /* Matches your primary color */
+            border: 2px solid #0a0815;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The spindle hole */
+        .vinyl-hole {
+            width: 15%;
+            height: 15%;
+            border-radius: 50%;
+            background: #0a0815;
+        }
+
+        /* Only spin when the sticker is visible */
+        .sticker.show .vinyl-disc {
+            animation: spinRecord 10s linear infinite;
+        }
+
+        /* --- STICKER PLACEMENTS --- */
+        #sticker-0 { top: 15%; left: 8%; --rot: -8deg; }
+        #sticker-1 { bottom: 20%; right: 10%; --rot: 12deg; }
+        #sticker-2 { top: 60%; left: 6%; --rot: 5deg; }
+        #sticker-3 { top: 12%; right: 7%; --rot: -15deg; }
+
+        /* Rest of the original layout CSS */
         .container {
-            max-width: 900px; /* Made the overall container wider */
+            max-width: 900px; 
             width: 92%;
             display: flex;
             flex-direction: column;
@@ -72,13 +168,14 @@
             text-align: center;
             animation: fadeInDown var(--transition-speed) var(--smooth-ease) forwards;
             opacity: 0;
+            margin-top: 40px;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
             font-size: 4.5rem;
             font-weight: 600;
-            color: var(--primary);
+            color: #b39ddb;
             margin-bottom: 5px;
             letter-spacing: 5px;
             text-shadow: 0 0 15px rgba(179, 157, 219, 0.1);
@@ -92,7 +189,6 @@
             letter-spacing: 1px;
         }
 
-        /* Container for the transitional messages - Taller to accommodate larger text */
         .message-viewport {
             position: relative;
             width: 100%;
@@ -104,56 +200,45 @@
             margin-bottom: 50px;
         }
 
-        /* Main structure for each message card - Bigger and slightly rounded */
         .message-card {
             position: absolute;
             width: 100%;
-            max-width: 850px; /* Bigger inner box */
+            max-width: 850px; 
             text-align: center;
-            
             background: var(--glass-bg);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
             border: 1px solid var(--glass-border);
-            
-            /* SLIGHTLY ROUNDED CORNERS (Reduced from 40px to 16px) */
             border-radius: 16px; 
-            padding: 70px 60px; /* Increased padding for a larger feel */
-            
+            padding: 70px 60px; 
             box-shadow: 0 15px 50px -5px rgba(0, 0, 0, 0.4);
-            
             opacity: 0;
             transform: translateY(30px) scale(0.98); 
             pointer-events: none; 
-            
             transition: opacity var(--transition-speed) var(--smooth-ease), 
                         transform var(--transition-speed) var(--smooth-ease);
         }
 
-        /* Message text details - Larger, cleaner typography */
         .message-card p {
-            font-size: 1.35rem; /* Larger text size */
+            font-size: 1.35rem; 
             line-height: 1.8;
             margin-bottom: 0;
             font-weight: 300;
             letter-spacing: 0.8px;
         }
 
-        /* State for the active message */
         .message-card.active {
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
 
-        /* State for the message moving out */
         .message-card.out {
             opacity: 0;
             transform: translateY(-30px) scale(1.02); 
             pointer-events: none;
         }
 
-        /* Style for the 'Next' control container */
         .controls {
             display: flex;
             justify-content: center;
@@ -161,13 +246,13 @@
             animation: fadeInUp var(--transition-speed) var(--smooth-ease) 2s forwards;
             opacity: 0;
             z-index: 20;
+            margin-bottom: 40px;
         }
 
-        /* The dynamic button */
         .nav-btn {
             background: rgba(179, 157, 219, 0.05);
             border: 1px solid rgba(179, 157, 219, 0.2);
-            color: var(--primary);
+            color: #b39ddb;
             font-family: 'Lora', serif;
             font-size: 1rem;
             letter-spacing: 2px;
@@ -188,7 +273,6 @@
             transform: translateY(-2px);
         }
 
-        /* Pulsing indicator on the button */
         .nav-btn:after {
             content: '';
             position: absolute;
@@ -198,20 +282,18 @@
             animation: buttonPulse 2.5s infinite var(--smooth-ease);
         }
 
-        /* The updated signature on the final slide */
         .signature {
             margin-top: 50px;
             font-size: 1.4rem;
             font-family: 'Playfair Display', serif;
             font-style: italic;
-            color: var(--primary);
+            color: #b39ddb;
             opacity: 0;
             transition: opacity 2s var(--smooth-ease) 0.8s;
             letter-spacing: 1px;
         }
         .signature.show { opacity: 0.8; } 
 
-        /* Animations */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -230,13 +312,23 @@
             80% { opacity: 0.5; }
             100% { transform: translateY(-10vh) translateX(20px) scale(1); opacity: 0; }
         }
+        @keyframes spinRecord {
+            100% { transform: rotate(360deg); }
+        }
 
-        /* Mobile Responsive Adjustments */
-     
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            /* Shrink and tuck stickers out of the way on smaller screens */
+            .sticker { transform: scale(0.4) !important; opacity: 0.3 !important; }
+            #sticker-0 { top: 5%; left: -5%; }
+            #sticker-1 { bottom: 15%; right: -5%; }
+            #sticker-2 { top: 40%; left: -5%; }
+            #sticker-3 { top: 5%; right: -5%; }
+        }
         @media (max-width: 600px) {
             h1 { font-size: 3rem; letter-spacing: 2px; }
-            .subtitle { font-size: 1rem; margin-bottom: 20px; } /* Reduced margin */
-            .message-viewport { height: 420px; margin-bottom: 20px; } /* Adjusted height & margin */
+            .subtitle { font-size: 1rem; margin-bottom: 20px; } 
+            .message-viewport { height: 440px; margin-bottom: 20px; } 
             .message-card { padding: 35px 20px; border-radius: 12px;}
             .message-card p { font-size: 1.15rem; line-height: 1.7; }
             .signature { font-size: 1.2rem; margin-top: 30px; }
@@ -245,16 +337,48 @@
 </head>
 <body>
 
-    <!-- Subtle Ambient Glow -->
     <div class="glow"></div>
     
-    <!-- JavaScript to generate subtle particles -->
+    <!-- STICKERS LAYER -->
+    <div class="stickers-layer">
+        
+        <!-- Step 1 Sticker: Quote -->
+        <div class="sticker" id="sticker-0">
+            <div class="quote-note">"To love is to recognize yourself in another."</div>
+        </div>
+
+        <!-- Step 2 Sticker: Vinyl Record -->
+        <div class="sticker" id="sticker-1">
+            <div class="vinyl-disc">
+                <div class="vinyl-label">
+                    <div class="vinyl-hole"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 Sticker: Quote -->
+        <div class="sticker" id="sticker-2">
+            <div class="quote-note">Some echoes never fade.</div>
+        </div>
+
+        <!-- Step 4 Sticker: Vinyl Record -->
+        <div class="sticker" id="sticker-3">
+            <div class="vinyl-disc">
+                <div class="vinyl-label" style="background: #9e9eb0;">
+                    <div class="vinyl-hole"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Particles Generation -->
     <script>
-        for(let i = 0; i < 40; i++) {
+        for(let i = 0; i < 35; i++) {
             let particle = document.createElement('div');
             particle.className = 'particle';
             particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.width = Math.random() * 6 + 1 + 'px';
+            particle.style.width = Math.random() * 5 + 1 + 'px';
             particle.style.height = particle.style.width;
             particle.style.animationDuration = (Math.random() * 20 + 12) + 's';
             particle.style.animationDelay = Math.random() * 12 + 's';
@@ -268,40 +392,38 @@
             <p class="subtitle">Some feelings outlive the moments that created them.</p>
         </header>
 
-        <!-- Main section holding the dynamic messages -->
         <div class="message-viewport">
             
-            <!-- Message 1 -->
             <div class="message-card active" id="msg-1">
                 <p>I built this space because sometimes words unsaid take up the most room in my mind. I needed to put this out into the universe to let you know how much I miss you, and how deeply I still care.</p>
             </div>
             
-            <!-- Message 2 - Now includes E.E. Cummings poetry -->
             <div class="message-card" id="msg-2">
                 <p>The quiet moments, your laugh, the way the world just makes a little more sense when you are around—I miss all of it. As the poet E.E. Cummings beautifully wrote, <i>"I carry your heart with me (I carry it in my heart)."</i></p>
             </div>
             
-            <!-- Message 3 - Changed to not sound like a goodbye -->
             <div class="message-card" id="msg-3">
                 <p>This isn't a goodbye. It is simply me leaving a light on in the window, hoping you know that the space you hold in my life will always remain yours.</p>
             </div>
             
-            <!-- Message 4: The explicit declaration, with the signature -->
             <div class="message-card" id="msg-4">
                 <p>I needed you to know... I still love you. And I miss you so much.</p>
-                <!-- Updated Signature at last -->
                 <div class="signature" id="signature">With Love from ARCANE</div>
             </div>
 
         </div>
 
-        <!-- The navigation button -->
         <div class="controls">
             <button class="nav-btn" id="nextBtn">Begin</button>
         </div>
     </div>
 
-    <!-- JavaScript to handle the click and the smoothly animated transitions -->
+    <!-- Hidden Developer Console Tribute -->
+    <script>
+        console.log("%cThere are some things code cannot compile, and some variables that never change.", "color: #b39ddb; font-style: italic; font-size: 14px; font-family: serif;");
+        console.log("%c— ARCANE", "color: #9e9eb0; font-size: 12px; margin-top: 5px;");
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const messages = document.querySelectorAll('.message-card');
@@ -311,42 +433,60 @@
             let currentIndex = 0;
             const finalIndex = messages.length - 1;
 
-            // Define dynamic button text based on position
+            // Function to handle showing stickers one by one
+            function updateStickers(index) {
+                // First, hide all stickers
+                document.querySelectorAll('.sticker').forEach(el => el.classList.remove('show'));
+                
+                // Then, show all stickers up to the current index
+                for(let i = 0; i <= index; i++) {
+                    const sticker = document.getElementById(`sticker-${i}`);
+                    if(sticker) {
+                        sticker.classList.add('show');
+                    }
+                }
+            }
+
             function updateButtonText() {
                 if (currentIndex === 0) {
                     nextBtn.textContent = 'Begin';
                 } else if (currentIndex === finalIndex) {
-                    nextBtn.textContent = 'Rewind'; // Now says Rewind instead of fading away
+                    nextBtn.textContent = 'Rewind'; 
                 } else {
                     nextBtn.textContent = 'Continue';
                 }
             }
-            updateButtonText(); // Set initial text
+            
+            // Initial call to set text and show first sticker (after a slight delay for aesthetic entry)
+            updateButtonText(); 
+            setTimeout(() => { updateStickers(0); }, 1500);
 
             nextBtn.addEventListener('click', () => {
                 const currentMsg = messages[currentIndex];
                 
-                // --- REWIND LOGIC ---
-                // If we are on the last slide and click "Rewind"
+                // REWIND LOGIC
                 if (currentIndex === finalIndex) {
                     currentMsg.classList.add('out');
                     currentMsg.classList.remove('active');
-                    signature.classList.remove('show'); // Hide signature
+                    signature.classList.remove('show'); 
+                    
+                    // Hide all stickers to reset
+                    document.querySelectorAll('.sticker').forEach(el => el.classList.remove('show'));
 
                     setTimeout(() => {
                         currentMsg.classList.remove('out');
-                        currentIndex = 0; // Reset to the beginning
-                        messages[0].classList.add('active'); // Show first message
+                        currentIndex = 0; 
+                        messages[0].classList.add('active'); 
                         updateButtonText();
+                        updateStickers(0); // Bring back just the first sticker
                     }, 1400);
-                    return; // Stop the rest of the function from running
+                    return; 
                 }
 
-                // --- NORMAL FORWARD LOGIC ---
+                // NORMAL FORWARD LOGIC
                 currentMsg.classList.add('out');
                 currentMsg.classList.remove('active');
 
-                // Wait for the smooth move-out transition to complete
                 setTimeout(() => {
                     currentIndex++; 
                     
@@ -357,10 +497,9 @@
                         nextMsg.classList.add('active');
                         
                         updateButtonText();
+                        updateStickers(currentIndex); // Trigger the next sticker to appear
                         
-                        // Special handling for the final message slide
                         if (currentIndex === finalIndex) {
-                            // Make the signature appear gracefully
                             setTimeout(() => {
                                 signature.classList.add('show');
                             }, 1400); 
