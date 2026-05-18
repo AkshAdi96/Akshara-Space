@@ -32,7 +32,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; 
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Ambient, very soft center glow */
@@ -231,13 +232,14 @@
         }
 
         /* Mobile Responsive Adjustments */
+     
         @media (max-width: 600px) {
             h1 { font-size: 3rem; letter-spacing: 2px; }
-            .subtitle { font-size: 1rem; margin-bottom: 30px; }
-            .message-viewport { height: 480px; }
-            .message-card { padding: 40px 25px; border-radius: 12px;}
+            .subtitle { font-size: 1rem; margin-bottom: 20px; } /* Reduced margin */
+            .message-viewport { height: 420px; margin-bottom: 20px; } /* Adjusted height & margin */
+            .message-card { padding: 35px 20px; border-radius: 12px;}
             .message-card p { font-size: 1.15rem; line-height: 1.7; }
-            .signature { font-size: 1.2rem; margin-top: 40px; }
+            .signature { font-size: 1.2rem; margin-top: 30px; }
         }
     </style>
 </head>
