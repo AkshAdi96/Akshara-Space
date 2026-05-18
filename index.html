@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            var(--primary): #b39ddb; 
+            --primary: #b39ddb; 
             --background: #110c22; 
             --text-light: #e0e0eb; 
             
@@ -16,6 +16,10 @@
             
             --transition-speed: 1.4s; 
             --smooth-ease: cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Variables to control sticker sizes dynamically */
+            --sticker-scale: 1;
+            --sticker-opacity: 0.8;
         }
 
         body {
@@ -28,8 +32,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-            overflow-y: auto;   /* Allow vertical scrolling on mobile */
+            overflow-x: hidden; 
+            overflow-y: auto;   
         }
 
         .glow {
@@ -57,25 +61,23 @@
         .stickers-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Let clicks pass through to the button */
-            z-index: 5; /* Behind the main text box, but above background */
+            pointer-events: none; 
+            z-index: 2; /* Pushed further back behind the main card */
         }
 
         .sticker {
             position: absolute;
             opacity: 0;
-            /* Start slightly pushed out and scaled down */
             transform: scale(0.6) rotate(var(--rot)) translateY(30px);
             transition: all 1.8s var(--smooth-ease);
         }
 
-        /* When the JS adds the 'visible' class */
+        /* Updated to use CSS variables so it doesn't override mobile settings */
         .sticker.show {
-            opacity: 0.8;
-            transform: scale(1) rotate(var(--rot)) translateY(0);
+            opacity: var(--sticker-opacity);
+            transform: scale(var(--sticker-scale)) rotate(var(--rot)) translateY(0);
         }
 
-        /* Glass Quote Note Design */
         .quote-note {
             background: rgba(140, 110, 210, 0.08);
             backdrop-filter: blur(12px);
@@ -92,7 +94,6 @@
             text-align: center;
         }
         
-        /* The "tape" holding the note */
         .quote-note::before {
             content: '';
             position: absolute;
@@ -106,12 +107,10 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Pure CSS Vinyl Record Design */
         .vinyl-disc {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            /* Creating the grooves of a record */
             background: repeating-radial-gradient(
                 circle at center, 
                 #111 0, #111 2px, 
@@ -123,19 +122,17 @@
             align-items: center;
         }
         
-        /* The colorful center label */
         .vinyl-label {
             width: 35%;
             height: 35%;
             border-radius: 50%;
-            background: #b39ddb; /* Matches your primary color */
+            background: #b39ddb; 
             border: 2px solid #0a0815;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* The spindle hole */
         .vinyl-hole {
             width: 15%;
             height: 15%;
@@ -143,18 +140,16 @@
             background: #0a0815;
         }
 
-        /* Only spin when the sticker is visible */
         .sticker.show .vinyl-disc {
             animation: spinRecord 10s linear infinite;
         }
 
-        /* --- STICKER PLACEMENTS --- */
         #sticker-0 { top: 15%; left: 8%; --rot: -8deg; }
         #sticker-1 { bottom: 20%; right: 10%; --rot: 12deg; }
         #sticker-2 { top: 60%; left: 6%; --rot: 5deg; }
         #sticker-3 { top: 12%; right: 7%; --rot: -15deg; }
 
-        /* Rest of the original layout CSS */
+        /* Rest of layout CSS */
         .container {
             max-width: 900px; 
             width: 92%;
@@ -316,16 +311,24 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile Adjustments */
+        /* --- MOBILE ADJUSTMENTS --- */
         @media (max-width: 900px) {
-            /* Shrink and tuck stickers out of the way on smaller screens */
-            .sticker { transform: scale(0.4) !important; opacity: 0.3 !important; }
-            #sticker-0 { top: 5%; left: -5%; }
-            #sticker-1 { bottom: 15%; right: -5%; }
-            #sticker-2 { top: 40%; left: -5%; }
-            #sticker-3 { top: 5%; right: -5%; }
+            /* On iPads or smaller laptops, turn them into faint, small watermarks in the background */
+            :root {
+                --sticker-scale: 0.45;
+                --sticker-opacity: 0.2;
+            }
+            #sticker-0 { top: 5%; left: -2%; }
+            #sticker-1 { bottom: 10%; right: -2%; }
+            #sticker-2 { top: 75%; left: -2%; }
+            #sticker-3 { top: 5%; right: -2%; }
         }
-        @media (max-width: 600px) {
+        
+        @media (max-width: 768px) {
+            /* On phones, completely hide the stickers so they never block the text */
+            .stickers-layer {
+                display: none;
+            }
             h1 { font-size: 3rem; letter-spacing: 2px; }
             .subtitle { font-size: 1rem; margin-bottom: 20px; } 
             .message-viewport { height: 440px; margin-bottom: 20px; } 
@@ -339,15 +342,10 @@
 
     <div class="glow"></div>
     
-    <!-- STICKERS LAYER -->
     <div class="stickers-layer">
-        
-        <!-- Step 1 Sticker: Quote -->
         <div class="sticker" id="sticker-0">
             <div class="quote-note">"To love is to recognize yourself in another."</div>
         </div>
-
-        <!-- Step 2 Sticker: Vinyl Record -->
         <div class="sticker" id="sticker-1">
             <div class="vinyl-disc">
                 <div class="vinyl-label">
@@ -355,13 +353,9 @@
                 </div>
             </div>
         </div>
-
-        <!-- Step 3 Sticker: Quote -->
         <div class="sticker" id="sticker-2">
             <div class="quote-note">Some echoes never fade.</div>
         </div>
-
-        <!-- Step 4 Sticker: Vinyl Record -->
         <div class="sticker" id="sticker-3">
             <div class="vinyl-disc">
                 <div class="vinyl-label" style="background: #9e9eb0;">
@@ -369,10 +363,8 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Particles Generation -->
     <script>
         for(let i = 0; i < 35; i++) {
             let particle = document.createElement('div');
@@ -393,7 +385,6 @@
         </header>
 
         <div class="message-viewport">
-            
             <div class="message-card active" id="msg-1">
                 <p>I built this space because sometimes words unsaid take up the most room in my mind. I needed to put this out into the universe to let you know how much I miss you, and how deeply I still care.</p>
             </div>
@@ -410,7 +401,6 @@
                 <p>I needed you to know... I still love you. And I miss you so much.</p>
                 <div class="signature" id="signature">With Love from ARCANE</div>
             </div>
-
         </div>
 
         <div class="controls">
@@ -418,7 +408,6 @@
         </div>
     </div>
 
-    <!-- Hidden Developer Console Tribute -->
     <script>
         console.log("%cThere are some things code cannot compile, and some variables that never change.", "color: #b39ddb; font-style: italic; font-size: 14px; font-family: serif;");
         console.log("%c— ARCANE", "color: #9e9eb0; font-size: 12px; margin-top: 5px;");
@@ -433,12 +422,8 @@
             let currentIndex = 0;
             const finalIndex = messages.length - 1;
 
-            // Function to handle showing stickers one by one
             function updateStickers(index) {
-                // First, hide all stickers
                 document.querySelectorAll('.sticker').forEach(el => el.classList.remove('show'));
-                
-                // Then, show all stickers up to the current index
                 for(let i = 0; i <= index; i++) {
                     const sticker = document.getElementById(`sticker-${i}`);
                     if(sticker) {
@@ -457,20 +442,17 @@
                 }
             }
             
-            // Initial call to set text and show first sticker (after a slight delay for aesthetic entry)
             updateButtonText(); 
             setTimeout(() => { updateStickers(0); }, 1500);
 
             nextBtn.addEventListener('click', () => {
                 const currentMsg = messages[currentIndex];
                 
-                // REWIND LOGIC
                 if (currentIndex === finalIndex) {
                     currentMsg.classList.add('out');
                     currentMsg.classList.remove('active');
                     signature.classList.remove('show'); 
                     
-                    // Hide all stickers to reset
                     document.querySelectorAll('.sticker').forEach(el => el.classList.remove('show'));
 
                     setTimeout(() => {
@@ -478,12 +460,11 @@
                         currentIndex = 0; 
                         messages[0].classList.add('active'); 
                         updateButtonText();
-                        updateStickers(0); // Bring back just the first sticker
+                        updateStickers(0); 
                     }, 1400);
                     return; 
                 }
 
-                // NORMAL FORWARD LOGIC
                 currentMsg.classList.add('out');
                 currentMsg.classList.remove('active');
 
@@ -497,7 +478,7 @@
                         nextMsg.classList.add('active');
                         
                         updateButtonText();
-                        updateStickers(currentIndex); // Trigger the next sticker to appear
+                        updateStickers(currentIndex); 
                         
                         if (currentIndex === finalIndex) {
                             setTimeout(() => {
